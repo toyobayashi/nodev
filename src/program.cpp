@@ -400,8 +400,9 @@ bool program::get(const std::string& version) const {
     }
 
     nodev::untgz(tgzpath, toyo::path::join(toyo::path::dirname(tgzpath), "tmp"));
-  
-    toyo::fs::copy_file(toyo::path::join(toyo::path::dirname(tgzpath), "tmp", node_name, "bin/node"), node_path);
+    std::string nodeexe = toyo::path::join(toyo::path::dirname(tgzpath), "tmp", node_name, "bin/node");
+    toyo::fs::chmod(nodeexe, 0777);
+    toyo::fs::copy_file(nodeexe, node_path);
     toyo::fs::remove(toyo::path::join(toyo::path::dirname(tgzpath), "tmp"));
     toyo::fs::remove(tgzpath);
     return true;
@@ -512,14 +513,18 @@ bool program::use_npm(const std::string& version) const {
   delete progress;
   try {
     toyo::fs::rename(toyo::path::join(npm_unzip_dir, "cli-" + version), npmdir);
+    std::string npmbin = toyo::path::join(root_dir, "npm");
+    std::string npxbin = toyo::path::join(root_dir, "npx");
 #ifdef _WIN32
-    toyo::fs::copy(toyo::path::join(npmdir, "bin/npm"), toyo::path::join(root_dir, "npm"));
+    toyo::fs::copy(toyo::path::join(npmdir, "bin/npm"), npmbin);
     toyo::fs::copy(toyo::path::join(npmdir, "bin/npm.cmd"), toyo::path::join(root_dir, "npm.cmd"));
-    toyo::fs::copy(toyo::path::join(npmdir, "bin/npx"), toyo::path::join(root_dir, "npx"));
+    toyo::fs::copy(toyo::path::join(npmdir, "bin/npx"), npxbin);
     toyo::fs::copy(toyo::path::join(npmdir, "bin/npx.cmd"), toyo::path::join(root_dir, "npx.cmd"));
 #else
-    toyo::fs::symlink(toyo::path::join(npmdir, "bin/npm-cli.js"), toyo::path::join(root_dir, "npm"));
-    toyo::fs::symlink(toyo::path::join(npmdir, "bin/npx-cli.js"), toyo::path::join(root_dir, "npx"));
+    toyo::fs::symlink(toyo::path::join(npmdir, "bin/npm-cli.js"), npmbin);
+    toyo::fs::chmod(npmbin, 0777);
+    toyo::fs::symlink(toyo::path::join(npmdir, "bin/npx-cli.js"), npxbin);
+    toyo::fs::chmod(npxbin, 0777);
 #endif
   } catch (const std::exception& err) {
     toyo::console::error(err.what());

@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
   if (command == "rm" || command == "uninstall") {
     auto args = cli.get_argument();
     if (args.size() == 0) {
-      toyo::console::log("Example: \n\n  nodev rm 12.16.2");
+      toyo::console::log("Example: \n\n  nodev %s 12.16.2", command.c_str());
       return 0;
     }
     program.rm(args[0]);
@@ -101,40 +101,40 @@ int main(int argc, char** argv) {
     return program.rm_npm() ? 0 : 1;
   }
 
-  if (command == "get" || command == "install") {
+  if (command == "get" || command == "install" || command == "get_node" || command == "getnode") {
     auto args = cli.get_argument();
     if (args.size() == 0) {
-      toyo::console::log("Example: \n\n  nodev get 12.16.2");
+      toyo::console::log("Example: \n\n  nodev %s 12.16.2", command.c_str());
       return 0;
     }
 
     return program.get(args[0]) ? 0 : 1;
   }
 
-  if (command == "get_npm") {
+  if (command == "get_npm" || command == "getnpm") {
     auto args = cli.get_argument();
     if (args.size() == 0) {
-      toyo::console::log("Example: \n\n  nodev get_npm 6.14.4");
+      toyo::console::log("Example: \n\n  nodev %s 6.14.4", command.c_str());
       return 0;
     }
 
     return program.get_npm(args[0]) ? 0 : 1;
   }
 
-  if (command == "use") {
+  if (command == "use" || command == "use_node" || command == "usenode") {
     auto args = cli.get_argument();
     if (args.size() == 0) {
-      toyo::console::log("Example: \n\n  nodev use 12.16.2");
+      toyo::console::log("Example: \n\n  nodev %s 12.16.2", command.c_str());
       return 0;
     }
 
     return program.use(args[0]) ? 0 : 1;
   }
 
-  if (command == "use_npm") {
+  if (command == "use_npm" || command == "usenpm") {
     auto args = cli.get_argument();
     if (args.size() == 0) {
-      toyo::console::log("Example: \n\n  nodev use_npm 6.14.4");
+      toyo::console::log("Example: \n\n  nodev %s 6.14.4", command.c_str());
       return 0;
     }
 
