@@ -1,9 +1,15 @@
+export MACOSX_DEPLOYMENT_TARGET="10.6"
+
 unamestr=`uname`
 os=`echo $unamestr | tr "A-Z" "a-z"`
 
 cd ./deps/curl
+./buildconf
 # sudo apt install libssl-dev -y
-./configure --prefix=`pwd`/builds/"$os" --with-ssl # --disable-shared
+./configure --prefix=`pwd`/builds/"$os" --with-darwinssl --disable-shared --enable-static --disable-thread --disable-ldap --disable-ldaps
 make
 make install
 cd ../..
+
+mkdir -p ./lib
+cp -rfp ./deps/curl/builds/"$os"/lib/libcurl.a ./lib/libcurl.a

@@ -54,9 +54,7 @@ static size_t onDataWrite(void* buffer, size_t size, size_t nmemb, progressInfo 
   }
 
   size_t iRec = fwrite(buffer, size, nmemb, userp->fp);
-  if (iRec < 0) {
-    return iRec;
-  }
+
   userp->sum += iRec;
   userp->speed += iRec;
   int now = clock();

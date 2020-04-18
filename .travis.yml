@@ -1,0 +1,43 @@
+language: node_js
+
+node_js:
+  - lts/*
+
+# os:
+#   - windows
+#   - linux
+#   - osx
+
+matrix:
+  include:
+    - os: windows
+      env:
+        - VCVARS_PATH="C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars32.bat"
+        - VCVER="15"
+    - os: linux
+      env:
+        - PLATFORM_NAME="linux"
+    - os: osx
+      compiler: clang
+      env:
+        - PLATFORM_NAME="darwin"
+
+script:
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then chmod +x ./build.sh ./scripts/buildzlib.sh; ./scripts/buildzlib.sh; ./build.sh; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then chmod +x ./build.sh ./scripts/buildzlib.sh ./scripts/buildcurl.sh; ./scripts/buildzlib.sh; ./scripts/buildcurl.sh; ./build.sh; fi
+  - if [ "$TRAVIS_OS_NAME" == "windows" ]; then ./scripts/buildzlib.bat; ./scripts/buildcurl.bat; ./build.bat win32 Release static; fi
+
+deploy:
+  provider: releases
+  api_key:
+    secure: T6lWtDTVl9I+aKFODFQD2ljyNPv+i7zCcZWDoAr2TNkgiNJQyT0tAJatSr6ej5ADS5LtG20wuvTskxfFnSPJsyWY4FBYJ8C9nB5AXuaWst68DqCNO0yVnuT50Q7X+ZB87zc9glZOgZrEt5lYBAUyVkvguJSLKlxqPL398tgm2gN/EDscNYd/s1zBL8IteHAIErv0iWjO6JtuGFdZzJW+3wtWoyRmDaYYU/72irviPTasU3h2EZG2d7FuZs9Z8bDNHF5IvuEOppTnitU1A/MRMOMk2ODqGj/qcAtp0Z5FFa/1Kcz/gvqLz7l8JOjQL93VsBvNS1fP98JT5c1hpDLvStmynpwFAdOwPppNwmTp+4xcR+cCc3gsMxU7Of3gjNoRWDMnC9U/feZWFYjXevlDpdlfYNab+wiBgN4xrYI/P/Vt+vYpSK+my3k4pQ21HX8GiSewZ+LvLt+fO76j6LmnIn9BLURM9vzUMo9KITO8ioncJjAcJCeWU0GoTfe1S76EGw/XfxT5SQca7hBuk9a+9L0tH+RcCkysfuIl1KfUncAX8CD9Pef8VH6StT44wUziI5+MbbMn+egwv9Lkz0hsSh9vVpV0MwZ3/rS9pRNAG7g/uuOJ8aplHI3iGkLV0APSCag6/Wci9CZE+AGXnt9yFSXk2wNkRws/Im2FiWJgY4k=
+  file: 
+    - ./dist/linux/bin/nodev-linux
+    - ./dist/darwin/bin/nodev-darwin
+    - ./dist/win/Win32/bin/nodev.exe
+  file_glob: true
+  skip_cleanup: true
+  draft: true
+  on:
+    repo: toyobayashi/nodev
+    tags: true

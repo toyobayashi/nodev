@@ -1,6 +1,10 @@
 @echo off
 
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsamd64_x86.bat"
+if /i "%VCVARS_PATH%"=="" (
+  call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsamd64_x86.bat"
+) else (
+  call "%VCVARS_PATH%"
+)
 
 REM cd deps\zlib\contrib\vstudio\vc16
 REM msbuild zlibvc.sln /t:Rebuild /p:Configuration=Release /p:Platform="Win32"
