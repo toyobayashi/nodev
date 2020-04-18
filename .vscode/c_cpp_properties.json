@@ -1,0 +1,53 @@
+{
+  "env": {
+    "includePath": [
+      "${default}",
+      "${workspaceFolder}/deps/curl/include",
+      "${workspaceFolder}/deps/zlib",
+      "${workspaceFolder}/node_modules/@ccpm/toyo/include"
+    ],
+    "clPath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.24.28314\\bin\\Hostx64\\x86\\cl.exe",
+    "gccPath": "/usr/bin/gcc",
+    "clangPath": "/usr/bin/clang",
+    "defines": ["NODEV_VERSION=\"1.0.0\"", "CURL_STATICLIB"]
+  },
+  "configurations": [
+    {
+      "name": "Win32",
+      "defines": ["UNICODE", "_UNICODE", "_CRT_SECURE_NO_WARNINGS", "${defines}"],
+      "compilerPath": "${clPath}",
+      "windowsSdkVersion": "10.0.18362.0",
+      "intelliSenseMode": "msvc-x86",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "includePath": ["${includePath}"]
+    },
+    {
+      "name": "Linux",
+      "defines": ["${defines}"],
+      "compilerPath": "${gccPath}",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "gcc-x64",
+      "browse": {
+        "path": [
+          "${workspaceFolder}"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      },
+      "includePath": ["${includePath}"]
+    },
+    {
+      "name": "macOS",
+      "includePath": ["${includePath}"],
+      "defines": ["${defines}"],
+      "macFrameworkPath": ["/System/Library/Frameworks", "/Library/Frameworks"],
+      "compilerPath": "${clangPath}",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "${default}"
+    }
+  ],
+  "version": 4
+}

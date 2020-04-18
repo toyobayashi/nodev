@@ -1,0 +1,9 @@
+[submodule "deps/toyo"]
+	path = deps/toyo
+	url = https://github.com/toyobayashi/toyo.git
+[submodule "deps/zlib"]
+	path = deps/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "deps/curl"]
+	path = deps/curl
+	url = https://github.com/curl/curl.git
