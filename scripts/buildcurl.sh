@@ -6,7 +6,7 @@ os=`echo $unamestr | tr "A-Z" "a-z"`
 cd ./deps/curl
 ./buildconf
 # sudo apt install libssl-dev -y
-./configure --prefix=`pwd`/builds/"$os" --with-darwinssl --disable-shared --enable-static --disable-thread --disable-ldap --disable-ldaps
+./configure --prefix=`pwd`/builds/"$os" --with-darwinssl --disable-shared --enable-static --disable-thread --without-libidn2 --disable-ldap --disable-ldaps
 make
 make install
 cd ../..

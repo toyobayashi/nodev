@@ -57,7 +57,7 @@ else()
     # target_compile_options(${EXE_NAME} PRIVATE -pthread)
     # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework CoreFoundation -framework Security")
     target_link_libraries(${EXE_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a" "${CMAKE_CURRENT_SOURCE_DIR}/lib/libcurl.a"
-      idn2
+      # idn2
       # ldap
       "-framework CoreFoundation"
       "-framework Security"
