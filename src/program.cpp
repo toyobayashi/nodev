@@ -113,7 +113,7 @@ std::string program::get_node_version(const std::string& exe_path) {
     // failed
   }
   std::string version = toyo::fs::read_file_to_string(tmpfile);
-  toyo::fs::unlink(tmpfile);
+  toyo::fs::remove(tmpfile);
 #ifdef _WIN32
   version = version.substr(1, version.length() - 3);
 #else
@@ -469,8 +469,11 @@ bool program::use(const std::string& version) const {
     }
   }
 
+  std::string root_dir = this->root_();
+
+  toyo::fs::mkdirs(root_dir);
   try {
-    toyo::fs::copy_file(node_path, toyo::path::join(this->root_(), "node" NODEV_EXE_EXT));
+    toyo::fs::copy_file(node_path, toyo::path::join(root_dir, "node" NODEV_EXE_EXT));
   } catch (const std::exception&) {
     toyo::console::error("Use failed.");
     return false;
@@ -517,6 +520,8 @@ bool program::use_npm(const std::string& version) const {
   }
 
   delete progress;
+
+  toyo::fs::mkdirs(root_dir);
   try {
     toyo::fs::rename(toyo::path::join(npm_unzip_dir, "cli-" + version), npmdir);
     std::string npmbin = toyo::path::join(root_dir, "npm");
@@ -562,7 +567,7 @@ bool program::rm_npm() const {
 void program::rm(const std::string& version) const {
   std::string node_name = this->node_name(version);
   std::string node_path = this->node_path(node_name);
-  toyo::fs::unlink(node_path);
+  toyo::fs::remove(node_path);
 }
 
 void program::node_mirror() const {
