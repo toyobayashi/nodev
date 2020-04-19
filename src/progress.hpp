@@ -18,7 +18,6 @@ public:
   void print();
 
 private:
-  static std::size_t get_terminal_width();
   cli_progress();
   std::string _title;
   int _min = 0;

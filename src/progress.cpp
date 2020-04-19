@@ -15,17 +15,6 @@
 #include "toyo/console.hpp"
 
 namespace nodev {
-std::size_t cli_progress::get_terminal_width() {
-#ifdef _WIN32
-  CONSOLE_SCREEN_BUFFER_INFO bInfo;
-  GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &bInfo);
-  return bInfo.dwSize.X;
-#else
-  struct winsize w;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-  return w.ws_col;
-#endif
-}
 
 cli_progress::~cli_progress() {
   printf("\n");
@@ -62,7 +51,7 @@ void cli_progress::set_additional(const std::string& additional) {
 
 void cli_progress::print() {
   // std::size_t outputlen = 0;
-  std::size_t terminal_width = get_terminal_width();
+  std::size_t terminal_width = toyo::console::get_terminal_width();
   toyo::console::clear_line(0);
   printf("%s ", _title.c_str());
   // outputlen += (_title.length() + 1);
