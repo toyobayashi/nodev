@@ -201,13 +201,19 @@ program::~program() {
     delete config_;
     config_ = nullptr;
   }
+
+  if (paths_) {
+    delete paths_;
+    paths_ = nullptr;
+  }
 }
 
 program::program() {
   dir = toyo::path::__dirname();
+  paths_ = new toyo::path::env_paths(toyo::path::env_paths::create(NODEV_EXECUTABLE_NAME));
   std::string config_file;
   try {
-    config_file = toyo::path::join(toyo::path::homedir(), "nodev.config.json");
+    config_file = toyo::path::join(paths_->config, "nodev.config.json");
   } catch (const std::exception& err) {
     toyo::console::error(err.what());
   }
@@ -602,30 +608,29 @@ void program::npm_cache(const std::string& dir) {
 }
 
 void program::help() const {
-  printf("\n");
-  printf("Node.js Version Manager %s\n\n", NODEV_VERSION);
+  toyo::console::log("\nNode.js Version Manager %s\n", NODEV_VERSION);
 
-  printf("Usage:\n\n");
-  printf("  nodev version\n");
-  printf("  nodev arch [x86 | x64]\n");
-  printf("  nodev npm_cache [<npm cache dir>]\n");
-  printf("  nodev node_cache [<node binary dir>]\n");
-  printf("  nodev root [<node binary dir>]\n");
-  printf("  nodev list\n");
-  printf("  nodev use <node version> [options]\n");
-  printf("  nodev usenpm <npm version> [options]\n");
-  printf("  nodev rm <node version>\n");
-  printf("  nodev rmnpm\n");
-  printf("  nodev get <node version> [options]\n");
-  printf("  nodev node_mirror [default | taobao | <url>]\n");
-  printf("  nodev npm_mirror [default | taobao | <url>]\n");
+  toyo::console::log("Usage:\n");
+  toyo::console::log("  %s version", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s arch [x86 | x64]", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s npm_cache [<npm cache dir>]", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s node_cache [<node binary dir>]", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s root [<node binary dir>]", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s list", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s use <node version> [options]", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s usenpm <npm version> [options]", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s rm <node version>", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s rmnpm", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s get <node version> [options]", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s node_mirror [default | taobao | <url>]", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s npm_mirror [default | taobao | <url>]\n", NODEV_EXECUTABLE_NAME);
 
-  printf("\n");
+  toyo::console::log("Options:\n");
+  toyo::console::log("  --node_arch=<x86 | x64>");
+  toyo::console::log("  --node_mirror=<default | taobao | <url>>");
+  toyo::console::log("  --npm_mirror=<default | taobao | <url>>\n");
 
-  printf("Options:\n\n");
-  printf("  --node_arch=<x86 | x64>\n");
-  printf("  --node_mirror=<default | taobao | <url>>\n");
-  printf("  --npm_mirror=<default | taobao | <url>>\n");
+  toyo::console::log("Config file path: " + config_->config_path);
 }
 
 }

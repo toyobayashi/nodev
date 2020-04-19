@@ -43,14 +43,23 @@ class nodev_config {
   std::string config_path;
 
   nodev_config():
+#ifdef _WIN32
     root(toyo::path::__dirname()),
+#else
+    root(toyo::path::join(toyo::path::__dirname(), "bin")),
+#endif
     node_mirror("https://nodejs.org/dist"),
-    node_cache_dir("cache/node"),
+    node_cache_dir(""),
     node_arch(get_arch()),
     npm_mirror("https://github.com/npm/cli/archive"),
-    npm_cache_dir("cache/npm"),
-    config_path("") {}
-  
+    npm_cache_dir(""),
+    config_path("") {
+    
+    auto env_paths = toyo::path::env_paths::create(NODEV_EXECUTABLE_NAME);
+    this->node_cache_dir = toyo::path::join(env_paths.cache, "node");
+    this->npm_cache_dir = toyo::path::join(env_paths.cache, "npm");
+  }
+
   nodev_config(const std::string& config_path): nodev_config() {
     this->config_path = config_path;
   }
@@ -73,7 +82,7 @@ class nodev_config {
         JSON_CONFIGURE(node, cache_dir_key, node_cache_dir);
         JSON_CONFIGURE(node, arch_key, node_arch);
       }
-      if (JSON_HAS(configjson, npm_key) && configjson[node_key].is_object()) {
+      if (JSON_HAS(configjson, npm_key) && configjson[npm_key].is_object()) {
         nlohmann::json npm = configjson[npm_key];
         JSON_CONFIGURE(npm, mirror_key, npm_mirror);
         JSON_CONFIGURE(npm, cache_dir_key, npm_cache_dir);
@@ -152,6 +161,7 @@ class nodev_config {
 
   void write(const nlohmann::json& json) {
     if (config_path != "") {
+      toyo::fs::mkdirs(toyo::path::dirname(config_path));
       toyo::fs::write_file(config_path, json.dump(2) + NODEV_EOL);
     }
   }

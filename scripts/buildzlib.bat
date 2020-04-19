@@ -15,6 +15,7 @@ nmake /f win32\Makefile.msc LOC=-MT
 cd ..\..
 mkdir lib
 copy /Y deps\zlib\zlib.lib  lib\zlib.lib
+copy /Y deps\zlib\zlib.pdb  lib\zlib.pdb
 cd deps\zlib
 nmake /f win32\Makefile.msc clean
 cd ..\..

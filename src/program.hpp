@@ -10,6 +10,7 @@ namespace nodev {
 class program {
  private:
   nodev_config* config_;
+  toyo::path::env_paths* paths_;
   std::string dir;
   std::string root_() const;
   std::string node_cache_dir() const;

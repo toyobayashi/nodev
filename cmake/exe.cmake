@@ -15,7 +15,11 @@ add_executable(${EXE_NAME} ${EXE_SOURCE_FILES}
 
 set_target_properties(${EXE_NAME} PROPERTIES CXX_STANDARD 11)
 
-target_compile_definitions(${EXE_NAME} PRIVATE CURL_STATICLIB NODEV_VERSION="${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+target_compile_definitions(${EXE_NAME}
+  PRIVATE CURL_STATICLIB
+  PRIVATE NODEV_VERSION="${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
+  PRIVATE NODEV_EXECUTABLE_NAME="${EXE_NAME}"
+)
 
 if(WIN32 AND MSVC)
   target_link_libraries(${EXE_NAME}
@@ -29,22 +33,27 @@ if(WIN32 AND MSVC)
     crypt32
     Normaliz
   )
-  target_include_directories(${EXE_NAME} PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/deps/curl/include"
-    "deps/zlib"
+  target_include_directories(${EXE_NAME}
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/deps/curl/include"
+    PRIVATE "deps/zlib"
   )
   # set_target_properties(${EXE_NAME} PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-  target_compile_options(${EXE_NAME} PRIVATE /utf-8)
-  target_compile_definitions(${EXE_NAME} PRIVATE
-    _CRT_SECURE_NO_WARNINGS
-    UNICODE
-    _UNICODE
+  target_compile_options(${EXE_NAME}
+    PRIVATE /utf-8
+  )
+  target_compile_definitions(${EXE_NAME}
+    PRIVATE _CRT_SECURE_NO_WARNINGS
+    PRIVATE UNICODE
+    PRIVATE _UNICODE
   )
 
   # target_compile_definitions(${EXE_NAME} PRIVATE ZLIB_WINAPI)
 
   if(${CCPM_BUILD_TYPE} MATCHES Debug)
-    target_link_options(${EXE_NAME} PRIVATE /NODEFAULTLIB:"libcmt.lib" /NODEFAULTLIB:"msvcrt.lib")
+    target_link_options(${EXE_NAME}
+      PRIVATE /NODEFAULTLIB:"libcmt.lib"
+      PRIVATE /NODEFAULTLIB:"msvcrt.lib"
+    )
   endif()
 else()
   if(NOT APPLE)
@@ -56,13 +65,18 @@ else()
   else()
     # target_compile_options(${EXE_NAME} PRIVATE -pthread)
     # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -framework CoreFoundation -framework Security")
-    target_link_libraries(${EXE_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a" "${CMAKE_CURRENT_SOURCE_DIR}/lib/libcurl.a"
+    target_link_libraries(${EXE_NAME}
+      "${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a"
+      "${CMAKE_CURRENT_SOURCE_DIR}/lib/libcurl.a"
       # idn2
       # ldap
       "-framework CoreFoundation"
       "-framework Security"
     )
-    target_include_directories(${EXE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/deps/curl/include" "deps/zlib")
+    target_include_directories(${EXE_NAME}
+      PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/deps/curl/include"
+      PRIVATE "deps/zlib"
+    )
   endif()
 endif()
 

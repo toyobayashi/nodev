@@ -63,28 +63,80 @@ Feature:
     $ npm -v
     ```
 
-Config file is `~/nodev.config.json`
+### Config file
 
-Example:
+* Windows: `~\AppData\Roaming\nodev\Config\nodev.config.json`
+
+* Linux: `~/.config/nodev/nodev.config.json`
+
+* macOS: `~/Library/Preferences/nodev/nodev.config.json`
+
+#### Options
+
+##### root
+
+* type: `string`
+
+* default: 
+    * Windows: `__dirname`
+    * Linux & macOS: `path.join(__dirname, 'bin')`
+
+The path to the directory of `node` executable, can be a relative path to nodev executable.
+
+##### node.mirror
+
+* type: `string`
+
+* default: `https://nodejs.org/dist`
+
+##### node.cacheDir
+
+* type: `string`
+
+* default: 
+    * Windows: `~\AppData\Local\nodev\Cache\node`
+    * Linux: `~/.cache/nodev/node`
+    * macOS: `~/Library/Caches/nodev/node`
+
+Can be a relative path to nodev executable.
+
+##### node.arch
+
+* type: `'x64' | 'x86'`
+
+* default: `x64`
+
+x86 is available on Windows only.
+
+##### npm.mirror
+
+* type: `string`
+
+* default: `https://github.com/npm/cli/archive`
+
+##### npm.cacheDir
+
+* type: `string`
+
+* default: 
+    * Windows: `~\AppData\Local\nodev\Cache\npm`
+    * Linux: `~/.cache/nodev/npm`
+    * macOS: `~/Library/Caches/nodev/npm`
+
+Can be a relative path to nodev executable.
+
+#### Example:
 
 ``` json
 {
-  // relative to nodev executable path, can be absolute
   "root": "bin",
-
   "node": {
     "mirror": "https://npm.taobao.org/mirrors/node",
-
-    // "x86" is available on Windows only
-    "arch": "x64", 
-
-    // relative to nodev executable path, can be absolute
-    "cacheDir": "cache/node" 
+    "cacheDir": "cache/node",
+    "arch": "x64"
   },
   "npm": {
     "mirror": "https://npm.taobao.org/mirrors/npm",
-
-    // relative to nodev executable path, can be absolute
     "cacheDir": "cache/npm"
   }
 }

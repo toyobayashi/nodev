@@ -61,28 +61,80 @@
     $ npm -v
     ```
 
-配置文件是 `~/nodev.config.json`
+### 配置文件
 
-例子：
+* Windows：`~\AppData\Roaming\nodev\Config\nodev.config.json`
+
+* Linux：`~/.config/nodev/nodev.config.json`
+
+* macOS：`~/Library/Preferences/nodev/nodev.config.json`
+
+#### 选项
+
+##### root
+
+* 类型：`string`
+
+* 默认值：
+    * Windows：`__dirname`
+    * Linux & macOS：`path.join(__dirname, 'bin')`
+
+`node` 可执行文件目录路径，可以是基于 `nodev` 可执行文件路径的相对路径。
+
+##### node.mirror
+
+* 类型：`string`
+
+* 默认值：`https://nodejs.org/dist`
+
+##### node.cacheDir
+
+* 类型：`string`
+
+* 默认值：
+    * Windows：`~\AppData\Local\nodev\Cache\node`
+    * Linux：`~/.cache/nodev/node`
+    * macOS：`~/Library/Caches/nodev/node`
+
+可以是基于 `nodev` 可执行文件路径的相对路径。
+
+##### node.arch
+
+* 类型：`'x64' | 'x86'`
+
+* 默认值：`x64`
+
+x86 只有在 Windows 上可用
+
+##### npm.mirror
+
+* 类型：`string`
+
+* 默认值：`https://github.com/npm/cli/archive`
+
+##### npm.cacheDir
+
+* 类型：`string`
+
+* 默认值：
+    * Windows：`~\AppData\Local\nodev\Cache\npm`
+    * Linux：`~/.cache/nodev/npm`
+    * macOS：`~/Library/Caches/nodev/npm`
+
+可以是基于 `nodev` 可执行文件路径的相对路径。
+
+#### 示例:
 
 ``` json
 {
-  // 相对于 nodev 可执行文件路径，也可以是绝对路径
   "root": "bin",
-
   "node": {
     "mirror": "https://npm.taobao.org/mirrors/node",
-
-    // "x86" 只有在 Windows 上可用
-    "arch": "x64", 
-
-    // 相对于 nodev 可执行文件路径，也可以是绝对路径
-    "cacheDir": "cache/node" 
+    "cacheDir": "cache/node",
+    "arch": "x64"
   },
   "npm": {
     "mirror": "https://npm.taobao.org/mirrors/npm",
-
-    // 相对于 nodev 可执行文件路径，也可以是绝对路径
     "cacheDir": "cache/npm"
   }
 }

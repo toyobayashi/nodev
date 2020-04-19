@@ -21,7 +21,7 @@ BEGIN
             VALUE "FileDescription", "Node.js Version Manager\0"
             VALUE "FileVersion", "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\0"
             VALUE "InternalName", "nodev\0"
-            VALUE "LegalCopyright", "Copyright (C) 2020 Toyobayashi\0"
+            VALUE "LegalCopyright", "Copyright (C) 2020 Toyobayashi. MIT license.\0"
             VALUE "OriginalFilename", "nodev.exe\0"
             VALUE "ProductName", "The nodev executable\0"
             VALUE "ProductVersion", "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}\0"
