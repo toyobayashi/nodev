@@ -2,7 +2,6 @@
 
 #include <sstream>
 #include <cmath>
-#include <ctime>
 #include <cstddef>
 #include <cstdio>
 
@@ -57,15 +56,15 @@ static size_t onDataWrite(void* buffer, size_t size, size_t nmemb, progressInfo 
 
   userp->sum += iRec;
   userp->speed += iRec;
-  int now = clock();
-  if (now - userp->last_time > 200) {
+  auto now = std::chrono::steady_clock::now();
+  if ((now - userp->last_time) > std::chrono::milliseconds(200)) {
     userp->last_time = now;
     userp->speed = 0;
     if (userp->callback) {
       userp->callback(userp, userp->param);
     }
   } else if (userp->sum == userp->total - userp->size) {
-    userp->end_time = clock();
+    userp->end_time = now;
     if (userp->callback) {
       userp->callback(userp, userp->param);
     }
@@ -110,6 +109,9 @@ bool download (const std::string& url, const std::string& path, downloadCallback
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
   //curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
 
+  auto now = std::chrono::steady_clock::now();
+  auto aday = std::chrono::hours(24);
+  
   progressInfo info;
   info.path = path;
   info.curl = curl;
@@ -117,9 +119,9 @@ bool download (const std::string& url, const std::string& path, downloadCallback
   info.size = size;
   info.sum = 0;
   info.speed = 0;
-  info.start_time = clock();
-  info.end_time = 0;
-  info.last_time = 0;
+  info.start_time = now;
+  info.end_time = now - aday;
+  info.last_time = now - aday;
   info.total = -1;
   info.param = param;
   info.code = -1;

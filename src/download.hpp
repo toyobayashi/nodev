@@ -2,6 +2,7 @@
 #define __NODEV_DOWNLOAD_H__
 
 #include <string>
+#include <chrono>
 #include "curl/curl.h"
 
 namespace nodev {
@@ -17,9 +18,9 @@ typedef struct progressInfo {
   long sum;
   long total;
   int speed;
-  double start_time;
-  double last_time;
-  double end_time;
+  std::chrono::steady_clock::time_point start_time;
+  std::chrono::steady_clock::time_point last_time;
+  std::chrono::steady_clock::time_point end_time;
   std::string path;
   downloadCallback callback;
   void* param;
