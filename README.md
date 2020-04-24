@@ -73,15 +73,17 @@ Feature:
 
 #### Options
 
-##### root
+##### prefix
 
 * type: `string`
 
-* default: 
-    * Windows: `__dirname`
-    * Linux & macOS: `path.join(__dirname, 'bin')`
+* default: `.`
 
-The path to the directory of `node` executable, can be a relative path to nodev executable.
+The location where node is installed, can be a relative path to nodev executable.
+
+Node.js executable path is `${prefix}\\node.exe` on Windows while `${prefix}/bin/node` on Linux / macOS.
+
+See [npm documentation](https://docs.npmjs.com/files/folders#prefix-configuration).
 
 ##### node.mirror
 
@@ -129,7 +131,7 @@ Can be a relative path to nodev executable.
 
 ``` json
 {
-  "root": "bin",
+  "prefix": ".",
   "node": {
     "mirror": "https://npm.taobao.org/mirrors/node",
     "cacheDir": "cache/node",

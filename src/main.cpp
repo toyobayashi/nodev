@@ -72,13 +72,13 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  if (command == "root") {
+  if (command == "prefix") {
     auto args = cli.get_argument();
     if (args.size() == 0) {
-      program.root();
+      program.prefix();
       return 0;
     }
-    program.root(args[0]);
+    program.prefix(args[0]);
     return 0;
   }
 

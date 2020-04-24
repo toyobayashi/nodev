@@ -196,6 +196,20 @@ bool program::is_executable(const std::string& exe_path) {
 #endif
 }
 
+std::string program::try_to_absolute(const std::string& p) {
+  std::string path = toyo::path::normalize(p);
+  if (toyo::path::is_absolute(path)) {
+    return path;
+  }
+
+  if (path.length() > 0 && path.find("~" + toyo::path::sep) == 0) {
+    path = toyo::path::homedir() + path.substr(1);
+    return path;
+  }
+
+  return path;
+}
+
 program::~program() {
   if (config_) {
     delete config_;
@@ -228,14 +242,24 @@ program::program() {
 program::program(const cli& cli): program() {
   config_->read_cli(cli);
 }
+std::string program::prefix_() const {
+  std::string prefix = try_to_absolute(config_->prefix);
+  return toyo::path::is_absolute(prefix) ? prefix : toyo::path::join(dir, prefix);
+}
 std::string program::root_() const {
-  return toyo::path::is_absolute(config_->root) ? config_->root : toyo::path::join(dir, config_->root);
+#ifdef _WIN32
+  return this->prefix_();
+#else
+  return toyo::path::join(this->prefix_(), "bin");
+#endif
 }
 std::string program::npm_cache_dir() const {
-  return toyo::path::is_absolute(config_->npm_cache_dir) ? config_->npm_cache_dir : toyo::path::join(this->root_(), config_->npm_cache_dir);
+  std::string npm_cache_dir = try_to_absolute(config_->npm_cache_dir);
+  return toyo::path::is_absolute(npm_cache_dir) ? npm_cache_dir : toyo::path::join(this->root_(), npm_cache_dir);
 }
 std::string program::node_cache_dir() const {
-  return toyo::path::is_absolute(config_->node_cache_dir) ? config_->node_cache_dir : toyo::path::join(this->root_(), config_->node_cache_dir);
+  std::string node_cache_dir = try_to_absolute(config_->node_cache_dir);
+  return toyo::path::is_absolute(node_cache_dir) ? node_cache_dir : toyo::path::join(this->root_(), node_cache_dir);
 }
 std::string program::node_name(const std::string& version) const {
   return std::string("node-v") + version + "-" + NODEV_PLATFORM + "-" + config_->node_arch + NODEV_EXE_EXT;
@@ -350,7 +374,7 @@ bool program::get(const std::string& version) const {
 
   try {
     sha256 = toyo::util::sha256::calc_file(node_path);
-    toyo::console::log(sha256);
+    toyo::console::log("SHA256: " + sha256);
   } catch (const std::exception& err) {
     toyo::console::error(err.what());
     return false;
@@ -465,6 +489,7 @@ bool program::use(const std::string& version) const {
   if (!toyo::fs::exists(node_path)) {
     if (!this->get(version)) {
       toyo::console::error("Use failed.");
+      toyo::console::error("Directory does not exists: " + node_path);
       return false;
     }
   }
@@ -474,8 +499,9 @@ bool program::use(const std::string& version) const {
   toyo::fs::mkdirs(root_dir);
   try {
     toyo::fs::copy_file(node_path, toyo::path::join(root_dir, "node" NODEV_EXE_EXT));
-  } catch (const std::exception&) {
+  } catch (const std::exception& err) {
     toyo::console::error("Use failed.");
+    toyo::console::error(std::string("Error: ") + err.what());
     return false;
   }
 
@@ -497,7 +523,7 @@ bool program::use_npm(const std::string& version) const {
 
   if (!toyo::fs::exists(npm_zip_path)) {
     if (!this->get_npm(version)) {
-      toyo::console::error("Use npm failed.");
+      toyo::console::error("Get npm version failed.");
       return false;
     }
   }
@@ -513,9 +539,10 @@ bool program::use_npm(const std::string& version) const {
       prog->set_pos(info->uncompressed);
       prog->print();
     }, progress);
-  } catch (const std::exception&) {
+  } catch (const std::exception& err) {
     delete progress;
     toyo::console::error("Use npm failed.");
+    toyo::console::error(std::string("Error: ") + err.what());
     return false;
   }
 
@@ -577,11 +604,11 @@ void program::node_mirror(const std::string& mirror) {
   config_->set_node_mirror(mirror);
 }
 
-void program::root() const {
-  toyo::console::log(this->root_());
+void program::prefix() const {
+  toyo::console::log(this->prefix_());
 }
-void program::root(const std::string& root) {
-  config_->set_root(root);
+void program::prefix(const std::string& root) {
+  config_->set_prefix(root);
 }
 
 void program::npm_mirror() const {
@@ -620,7 +647,7 @@ void program::help() const {
   toyo::console::log("  %s arch [x86 | x64]", NODEV_EXECUTABLE_NAME);
   toyo::console::log("  %s npm_cache [<npm cache dir>]", NODEV_EXECUTABLE_NAME);
   toyo::console::log("  %s node_cache [<node binary dir>]", NODEV_EXECUTABLE_NAME);
-  toyo::console::log("  %s root [<node binary dir>]", NODEV_EXECUTABLE_NAME);
+  toyo::console::log("  %s prefix [<node install location dir>]", NODEV_EXECUTABLE_NAME);
   toyo::console::log("  %s list", NODEV_EXECUTABLE_NAME);
   toyo::console::log("  %s use <node version> [options]", NODEV_EXECUTABLE_NAME);
   toyo::console::log("  %s usenpm <npm version> [options]", NODEV_EXECUTABLE_NAME);

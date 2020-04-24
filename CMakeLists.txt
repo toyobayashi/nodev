@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 
-project(nodev VERSION 0.2.1)
+project(nodev VERSION 0.3.0)
 
 set(EXE_NAME nodev)
 

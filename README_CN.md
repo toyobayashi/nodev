@@ -71,15 +71,19 @@
 
 #### 选项
 
-##### root
+##### prefix
 
-* 类型：`string`
+* type: `string`
 
-* 默认值：
-    * Windows：`__dirname`
-    * Linux & macOS：`path.join(__dirname, 'bin')`
+* default: `.`
 
-`node` 可执行文件目录路径，可以是基于 `nodev` 可执行文件路径的相对路径。
+Node.js 安装目录，可以是基于 `nodev` 可执行文件路径的相对路径。
+
+Windows 上可执行文件会被安装在：`${prefix}\\node.exe`
+
+Linux / macOS 上可执行文件会被安装在：`${prefix}/bin/node`
+
+详见 [npm 文档](https://docs.npmjs.com/files/folders#prefix-configuration)。
 
 ##### node.mirror
 
@@ -127,7 +131,7 @@ x86 只有在 Windows 上可用
 
 ``` json
 {
-  "root": "bin",
+  "prefix": ".",
   "node": {
     "mirror": "https://npm.taobao.org/mirrors/node",
     "cacheDir": "cache/node",

@@ -34,7 +34,7 @@ namespace nodev {
 
 class nodev_config {
  public:
-  std::string root;
+  std::string prefix;
   std::string node_mirror;
   std::string node_cache_dir;
   std::string node_arch;
@@ -43,18 +43,14 @@ class nodev_config {
   std::string config_path;
 
   nodev_config():
-#ifdef _WIN32
-    root(toyo::path::__dirname()),
-#else
-    root(toyo::path::join(toyo::path::__dirname(), "bin")),
-#endif
+    prefix(toyo::path::__dirname()),
     node_mirror("https://nodejs.org/dist"),
     node_cache_dir(""),
     node_arch(get_arch()),
     npm_mirror("https://github.com/npm/cli/archive"),
     npm_cache_dir(""),
     config_path("") {
-    
+
     auto env_paths = toyo::path::env_paths::create(NODEV_EXECUTABLE_NAME);
     this->node_cache_dir = toyo::path::join(env_paths.cache, "node");
     this->npm_cache_dir = toyo::path::join(env_paths.cache, "npm");
@@ -68,13 +64,13 @@ class nodev_config {
     if (config_path != "" && toyo::fs::exists(config_path)) {
       auto configjson = nlohmann::json::parse(toyo::fs::read_file_to_string(config_path));
       const std::string node_key = "node";
-      const std::string root_key = "root";
+      const std::string prefix_key = "prefix";
       const std::string npm_key = "npm";
       const std::string mirror_key = "mirror";
       const std::string cache_dir_key = "cacheDir";
       const std::string arch_key = "arch";
-      if (JSON_HAS(configjson, root_key) && configjson[root_key].is_string()) {
-        this->root = configjson[root_key].get<std::string>();
+      if (JSON_HAS(configjson, prefix_key) && configjson[prefix_key].is_string()) {
+        this->prefix = configjson[prefix_key].get<std::string>();
       }
       if (JSON_HAS(configjson, node_key) && configjson[node_key].is_object()) {
         nlohmann::json node = configjson[node_key];
@@ -106,11 +102,11 @@ class nodev_config {
     }
   }
 
-  void set_root(const std::string& value) {
-    this->root = value;
+  void set_prefix(const std::string& value) {
+    this->prefix = value;
     if (config_path != "") {
       auto configjson = toyo::fs::exists(config_path) ? nlohmann::json::parse(toyo::fs::read_file_to_string(config_path)) : nlohmann::json();
-      configjson["root"] = value;
+      configjson["prefix"] = value;
       this->write(configjson);
     }
   }
@@ -182,7 +178,7 @@ class nodev_config {
 
   void print() {
     std::map<std::string, std::string> res;
-    res["root"] = this->root;
+    res["prefix"] = this->prefix;
     res["node_mirror"] = this->node_mirror;
     res["node_cache_dir"] = this->node_cache_dir;
     res["node_arch"] = this->node_arch;

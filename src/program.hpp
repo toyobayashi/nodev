@@ -12,6 +12,7 @@ class program {
   nodev_config* config_;
   toyo::path::env_paths* paths_;
   std::string dir;
+  std::string prefix_() const;
   std::string root_() const;
   std::string node_cache_dir() const;
   std::string npm_cache_dir() const;
@@ -22,6 +23,7 @@ class program {
   static bool is_x64_executable(const std::string& exe_path);
   static bool is_executable(const std::string& exe_path);
   static std::string get_npm_version(const std::string& node_version);
+  static std::string try_to_absolute(const std::string& p);
  public:
   virtual ~program();
   program();
@@ -39,8 +41,8 @@ class program {
   bool rm_npm() const;
   void node_mirror() const;
   void node_mirror(const std::string& mirror);
-  void root() const;
-  void root(const std::string& root);
+  void prefix() const;
+  void prefix(const std::string& prefix);
   void npm_mirror() const;
   void npm_mirror(const std::string& mirror);
   void node_arch() const;
