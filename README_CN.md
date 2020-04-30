@@ -47,13 +47,7 @@
 
 4. 把 `nodev` 放进 `~/app/nodev`.
 
-5. 配置 node 可执行文件目录（相对于 `nodev` 可执行文件路径）
-
-    ``` bash
-    $ nodev root bin
-    ```
-
-6. 开始玩耍。
+5. 开始玩耍。
 
     ``` bash
     $ nodev use 12.16.2

@@ -49,13 +49,7 @@ Feature:
 
 4. Place `nodev` in `~/app/nodev`.
 
-5. Configure node executable directory (relative to `nodev` executable path)
-
-    ``` bash
-    $ nodev root bin
-    ```
-
-6. Enjoy yourself.
+5. Enjoy yourself.
 
     ``` bash
     $ nodev use 12.16.2
