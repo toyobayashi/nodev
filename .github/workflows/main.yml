@@ -20,7 +20,7 @@ jobs:
       if: ${{ matrix.os == 'windows-latest' }}
       shell: cmd
       env:
-        VCVARS_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat
+        VCVARS_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsamd64_x86.bat
         VCVER: 16
       run: |
         call .\scripts\buildzlib.bat
@@ -48,53 +48,46 @@ jobs:
         ./scripts/buildzlib.sh
         ./scripts/buildcurl.sh
         ./build.sh
-  draft:
-    name: Draft
-    needs: build
-    if: ${{ github.event.create.ref_type == 'tag' }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: true
-          prerelease: false
-      - name: Windows upload
-        if: ${{ matrix.os == 'windows-latest' }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./dist/win/Win32/bin/nodev.exe
-          asset_name: nodev.exe
-          asset_content_type: application/octet-stream
-      - name: Linux upload
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./dist/linux/bin/nodev-linux
-          asset_name: nodev-linux
-          asset_content_type: application/octet-stream
-      - name: macOS upload
-        if: ${{ matrix.os == 'macos-latest' }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./dist/darwin/bin/nodev-darwin
-          asset_name: nodev-darwin
-          asset_content_type: application/octet-stream
+    
+    - name: Create Release Draft
+      if: ${{ github.event.create.ref_type == 'tag' }}
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: false
+    
+    - name: Windows upload
+      if: ${{ github.event.create.ref_type == 'tag' && matrix.os == 'windows-latest' }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ./dist/win/Win32/bin/nodev.exe
+        asset_name: nodev.exe
+        asset_content_type: application/octet-stream
+    - name: Linux upload
+      if: ${{ github.event.create.ref_type == 'tag' && matrix.os == 'ubuntu-latest' }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ./dist/linux/bin/nodev-linux
+        asset_name: nodev-linux
+        asset_content_type: application/octet-stream
+    - name: macOS upload
+      if: ${{ github.event.create.ref_type == 'tag' && matrix.os == 'macos-latest' }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ./dist/darwin/bin/nodev-darwin
+        asset_name: nodev-darwin
+        asset_content_type: application/octet-stream
