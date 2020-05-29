@@ -7,7 +7,7 @@ jobs:
     name: Draft
     runs-on: ubuntu-latest
     outputs:
-      upload_url: ${{ steps.create_release.upload_url }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
     - name: Create Release Draft
       if: ${{ startsWith(github.event.ref, 'refs/tags') }}
