@@ -1,6 +1,7 @@
 # nodev
 
-[![Build status](https://api.travis-ci.com/toyobayashi/nodev.svg?branch=master&status=passed)](https://www.travis-ci.com/github/toyobayashi/nodev/)
+![Build](https://github.com/toyobayashi/nodev/workflows/Build/badge.svg)
+<!-- [![Build status](https://api.travis-ci.com/toyobayashi/nodev.svg?branch=master&status=passed)](https://www.travis-ci.com/github/toyobayashi/nodev/) -->
 
 [中文 README](README_CN.md)
 
