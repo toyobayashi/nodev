@@ -67,34 +67,43 @@ jobs:
         ./scripts/buildzlib.sh
         ./scripts/buildcurl.sh
         ./build.sh
+    
+    - name: Upload
+      if: ${{ startsWith(github.event.ref, 'refs/tags') }}
+      uses: toyobayashi/upload-release-assets@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.draft.outputs.upload_url }}
+        assets: ./dist/win/Win32/bin/nodev.exe; ./dist/linux/bin/nodev-linux; ./dist/darwin/bin/nodev-darwin
 
-    - name: Windows upload
-      if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'windows-latest' }}
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.draft.outputs.upload_url }} 
-        asset_path: ./dist/win/Win32/bin/nodev.exe
-        asset_name: nodev.exe
-        asset_content_type: application/octet-stream
-    - name: Linux upload
-      if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'ubuntu-latest' }}
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.draft.outputs.upload_url }} 
-        asset_path: ./dist/linux/bin/nodev-linux
-        asset_name: nodev-linux
-        asset_content_type: application/octet-stream
-    - name: macOS upload
-      if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'macos-latest' }}
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ needs.draft.outputs.upload_url }} 
-        asset_path: ./dist/darwin/bin/nodev-darwin
-        asset_name: nodev-darwin
-        asset_content_type: application/octet-stream
+    # - name: Windows upload
+    #   if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'windows-latest' }}
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     upload_url: ${{ needs.draft.outputs.upload_url }} 
+    #     asset_path: ./dist/win/Win32/bin/nodev.exe
+    #     asset_name: nodev.exe
+    #     asset_content_type: application/octet-stream
+    # - name: Linux upload
+    #   if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'ubuntu-latest' }}
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     upload_url: ${{ needs.draft.outputs.upload_url }} 
+    #     asset_path: ./dist/linux/bin/nodev-linux
+    #     asset_name: nodev-linux
+    #     asset_content_type: application/octet-stream
+    # - name: macOS upload
+    #   if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'macos-latest' }}
+    #   uses: actions/upload-release-asset@v1
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   with:
+    #     upload_url: ${{ needs.draft.outputs.upload_url }} 
+    #     asset_path: ./dist/darwin/bin/nodev-darwin
+    #     asset_name: nodev-darwin
+    #     asset_content_type: application/octet-stream
