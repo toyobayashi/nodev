@@ -12,88 +12,82 @@ jobs:
         os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
-    - name: Show event payload
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Windows build
+      if: ${{ matrix.os == 'windows-latest' }}
+      shell: cmd
       env:
-        EVENT_JSON: ${{ toJson(github.event) }}
+        VCVARS_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsamd64_x86.bat
+        VCVER: 16
+      run: |
+        call .\scripts\buildzlib.bat
+        call .\scripts\buildcurl.bat
+        call .\build.bat win32 Release static
+
+    - name: Linux build
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       shell: bash
-      run: echo $EVENT_JSON
+      env:
+        PLATFORM_NAME: linux
+      run: |
+        chmod +x ./build.sh ./scripts/buildzlib.sh
+        ./scripts/buildzlib.sh
+        ./build.sh
 
-    # - uses: actions/checkout@v2
-    #   with:
-    #     submodules: recursive
+    - name: macOS build
+      if: ${{ matrix.os == 'macos-latest' }}
+      shell: bash
+      env:
+        PLATFORM_NAME: darwin
+      run: |
+        brew install automake
+        chmod +x ./build.sh ./scripts/buildzlib.sh ./scripts/buildcurl.sh
+        ./scripts/buildzlib.sh
+        ./scripts/buildcurl.sh
+        ./build.sh
 
-    # - name: Windows build
-    #   if: ${{ matrix.os == 'windows-latest' }}
-    #   shell: cmd
-    #   env:
-    #     VCVARS_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsamd64_x86.bat
-    #     VCVER: 16
-    #   run: |
-    #     call .\scripts\buildzlib.bat
-    #     call .\scripts\buildcurl.bat
-    #     call .\build.bat win32 Release static
+    - name: Create Release Draft
+      if: ${{ startsWith(github.event.ref, 'refs/tags') }}
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: false
 
-    # - name: Linux build
-    #   if: ${{ matrix.os == 'ubuntu-latest' }}
-    #   shell: bash
-    #   env:
-    #     PLATFORM_NAME: linux
-    #   run: |
-    #     chmod +x ./build.sh ./scripts/buildzlib.sh
-    #     ./scripts/buildzlib.sh
-    #     ./build.sh
-
-    # - name: macOS build
-    #   if: ${{ matrix.os == 'macos-latest' }}
-    #   shell: bash
-    #   env:
-    #     PLATFORM_NAME: darwin
-    #   run: |
-    #     brew install automake
-    #     chmod +x ./build.sh ./scripts/buildzlib.sh ./scripts/buildcurl.sh
-    #     ./scripts/buildzlib.sh
-    #     ./scripts/buildcurl.sh
-    #     ./build.sh
-
-    # - name: Create Release Draft
-    #   if: ${{ startsWith(github.event.push.ref, 'refs/tags') }}
-    #   id: create_release
-    #   uses: actions/create-release@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     tag_name: ${{ github.ref }}
-    #     release_name: ${{ github.ref }}
-    #     draft: true
-    #     prerelease: false
-
-    # - name: Windows upload
-    #   if: ${{ startsWith(github.event.push.ref, 'refs/tags') && matrix.os == 'windows-latest' }}
-    #   uses: actions/upload-release-asset@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }} 
-    #     asset_path: ./dist/win/Win32/bin/nodev.exe
-    #     asset_name: nodev.exe
-    #     asset_content_type: application/octet-stream
-    # - name: Linux upload
-    #   if: ${{ startsWith(github.event.push.ref, 'refs/tags') && matrix.os == 'ubuntu-latest' }}
-    #   uses: actions/upload-release-asset@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }} 
-    #     asset_path: ./dist/linux/bin/nodev-linux
-    #     asset_name: nodev-linux
-    #     asset_content_type: application/octet-stream
-    # - name: macOS upload
-    #   if: ${{ startsWith(github.event.push.ref, 'refs/tags') && matrix.os == 'macos-latest' }}
-    #   uses: actions/upload-release-asset@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   with:
-    #     upload_url: ${{ steps.create_release.outputs.upload_url }} 
-    #     asset_path: ./dist/darwin/bin/nodev-darwin
-    #     asset_name: nodev-darwin
-    #     asset_content_type: application/octet-stream
+    - name: Windows upload
+      if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'windows-latest' }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ./dist/win/Win32/bin/nodev.exe
+        asset_name: nodev.exe
+        asset_content_type: application/octet-stream
+    - name: Linux upload
+      if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'ubuntu-latest' }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ./dist/linux/bin/nodev-linux
+        asset_name: nodev-linux
+        asset_content_type: application/octet-stream
+    - name: macOS upload
+      if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'macos-latest' }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: ./dist/darwin/bin/nodev-darwin
+        asset_name: nodev-darwin
+        asset_content_type: application/octet-stream
