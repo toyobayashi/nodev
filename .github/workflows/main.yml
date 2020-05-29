@@ -3,8 +3,27 @@ name: CI
 on: [push, pull_request]
 
 jobs:
+  draft:
+    name: Draft
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.event.ref, 'refs/tags') }}
+    outputs:
+      upload_url: ${{ steps.create_release.upload_url }}
+    steps:
+    - name: Create Release Draft
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: false
+
   build:
     name: Build
+    needs: draft
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -49,25 +68,13 @@ jobs:
         ./scripts/buildcurl.sh
         ./build.sh
 
-    - name: Create Release Draft
-      if: ${{ startsWith(github.event.ref, 'refs/tags') }}
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ github.ref }}
-        draft: true
-        prerelease: false
-
     - name: Windows upload
       if: ${{ startsWith(github.event.ref, 'refs/tags') && matrix.os == 'windows-latest' }}
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        upload_url: ${{ needs.draft.outputs.upload_url }} 
         asset_path: ./dist/win/Win32/bin/nodev.exe
         asset_name: nodev.exe
         asset_content_type: application/octet-stream
@@ -77,7 +84,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        upload_url: ${{ needs.draft.outputs.upload_url }} 
         asset_path: ./dist/linux/bin/nodev-linux
         asset_name: nodev-linux
         asset_content_type: application/octet-stream
@@ -87,7 +94,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        upload_url: ${{ needs.draft.outputs.upload_url }} 
         asset_path: ./dist/darwin/bin/nodev-darwin
         asset_name: nodev-darwin
         asset_content_type: application/octet-stream
