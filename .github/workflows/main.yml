@@ -6,11 +6,11 @@ jobs:
   draft:
     name: Draft
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.event.ref, 'refs/tags') }}
     outputs:
       upload_url: ${{ steps.create_release.upload_url }}
     steps:
     - name: Create Release Draft
+      if: ${{ startsWith(github.event.ref, 'refs/tags') }}
       id: create_release
       uses: actions/create-release@v1
       env:
