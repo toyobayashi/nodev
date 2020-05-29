@@ -19,7 +19,7 @@ jobs:
       if: ${{ matrix.os == 'windows-latest' }}
       shell: cmd
       env:
-        VCVARS_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsamd64_x86.bat
+        VCVARS_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat
         VCVER: 16
       run: |
         .\scripts\buildzlib.bat
@@ -42,7 +42,7 @@ jobs:
       env:
         PLATFORM_NAME: darwin
       run: |
-        chmod +x ./build.sh ./scripts/buildzlib.sh
+        chmod +x ./build.sh ./scripts/buildzlib.sh ./scripts/buildcurl.sh
         ./scripts/buildzlib.sh
         ./scripts/buildcurl.sh
         ./build.sh
