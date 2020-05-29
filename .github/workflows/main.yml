@@ -43,6 +43,7 @@ jobs:
       env:
         PLATFORM_NAME: darwin
       run: |
+        brew install automake
         chmod +x ./build.sh ./scripts/buildzlib.sh ./scripts/buildcurl.sh
         ./scripts/buildzlib.sh
         ./scripts/buildcurl.sh
