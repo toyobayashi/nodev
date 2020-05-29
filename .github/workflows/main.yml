@@ -36,7 +36,7 @@ jobs:
         chmod +x ./build.sh ./scripts/buildzlib.sh
         ./scripts/buildzlib.sh
         ./build.sh
-      
+
     - name: macOS build
       if: ${{ matrix.os == 'macos-latest' }}
       shell: bash
@@ -48,9 +48,9 @@ jobs:
         ./scripts/buildzlib.sh
         ./scripts/buildcurl.sh
         ./build.sh
-    
+
     - name: Create Release Draft
-      if: ${{ github.event.create.ref_type == 'tag' }}
+      if: ${{ startsWith(github.event.push.ref, 'refs/tags') }}
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -60,9 +60,9 @@ jobs:
         release_name: ${{ github.ref }}
         draft: true
         prerelease: false
-    
+
     - name: Windows upload
-      if: ${{ github.event.create.ref_type == 'tag' && matrix.os == 'windows-latest' }}
+      if: ${{ startsWith(github.event.push.ref, 'refs/tags') && matrix.os == 'windows-latest' }}
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +72,7 @@ jobs:
         asset_name: nodev.exe
         asset_content_type: application/octet-stream
     - name: Linux upload
-      if: ${{ github.event.create.ref_type == 'tag' && matrix.os == 'ubuntu-latest' }}
+      if: ${{ startsWith(github.event.push.ref, 'refs/tags') && matrix.os == 'ubuntu-latest' }}
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
         asset_name: nodev-linux
         asset_content_type: application/octet-stream
     - name: macOS upload
-      if: ${{ github.event.create.ref_type == 'tag' && matrix.os == 'macos-latest' }}
+      if: ${{ startsWith(github.event.push.ref, 'refs/tags') && matrix.os == 'macos-latest' }}
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
