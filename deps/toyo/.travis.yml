@@ -1,0 +1,29 @@
+language: node_js
+
+node_js:
+  - lts/*
+
+# os:
+  # - windows
+  # - linux
+  # - osx
+
+matrix:
+  include:
+    - os: windows
+    - os: linux
+      env:
+        - PLATFORM_NAME="linux"
+    - os: osx
+      compiler: clang
+      env:
+        - PLATFORM_NAME="darwin"
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then chmod +x ./build.sh; fi
+install:
+  - npm install
+script:
+  - cmake --version
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then ./build.bat static test; else ./build.sh test; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then ./build/win/x64/Release/toyotest.exe; else ./build/"$PLATFORM_NAME"/Release/toyotest; fi
