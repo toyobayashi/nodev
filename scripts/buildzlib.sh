@@ -1,4 +1,5 @@
 cd ./deps/zlib
+chmod +x ./configure
 ./configure
 make
 cd ../..

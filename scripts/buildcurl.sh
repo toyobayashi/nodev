@@ -4,6 +4,7 @@ unamestr=`uname`
 os=`echo $unamestr | tr "A-Z" "a-z"`
 
 cd ./deps/curl
+chmod +x ./buildconf ./configure
 ./buildconf
 # sudo apt install libssl-dev -y
 ./configure --prefix=`pwd`/builds/"$os" --with-darwinssl --disable-shared --enable-static --disable-thread --without-libidn2 --without-brotli --without-librtmp --disable-ldap --disable-ldaps
