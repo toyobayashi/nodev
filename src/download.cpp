@@ -35,8 +35,6 @@ static size_t onDataWrite(void* buffer, size_t size, size_t nmemb, progressInfo 
     curl_easy_getinfo(userp->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &cl);
     if (cl != -1) {
       userp->total = (long)cl + userp->size;
-    } else {
-      return size * nmemb;
     }
   }
 
@@ -63,17 +61,22 @@ static size_t onDataWrite(void* buffer, size_t size, size_t nmemb, progressInfo 
     if (userp->callback) {
       userp->callback(userp, userp->param);
     }
-  } else if (userp->sum == userp->total - userp->size) {
-    userp->end_time = now;
-    if (userp->callback) {
-      userp->callback(userp, userp->param);
-    }
   }
-  
+
   return iRec;
 }
 
-bool download (const std::string& url, const std::string& path, downloadCallback callback, void* param) {
+static int onClose(progressInfo* userp, curl_socket_t item) {
+  auto now = std::chrono::steady_clock::now();
+  userp->end_time = now;
+  userp->end = true;
+  if (userp->code < 400 && userp->callback) {
+    userp->callback(userp, userp->param);
+  }
+  return 0;
+}
+
+bool download (const std::string& url, const std::string& path, downloadCallback callback, void* param, char* msg) {
   if (toyo::fs::exists(path)) {
     if (toyo::fs::stat(path).is_directory()) {
       return false;
@@ -121,6 +124,7 @@ bool download (const std::string& url, const std::string& path, downloadCallback
   info.speed = 0;
   info.start_time = now;
   info.end_time = now - aday;
+  info.end = false;
   info.last_time = now - aday;
   info.total = -1;
   info.param = param;
@@ -130,6 +134,8 @@ bool download (const std::string& url, const std::string& path, downloadCallback
   // curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, &onDataString);
   // curl_easy_setopt(curl, CURLOPT_HEADERDATA, &info);
 
+  curl_easy_setopt(curl, CURLOPT_CLOSESOCKETFUNCTION, &onClose);
+  curl_easy_setopt(curl, CURLOPT_CLOSESOCKETDATA, &info);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &onDataWrite);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &info);
   curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -145,6 +151,9 @@ bool download (const std::string& url, const std::string& path, downloadCallback
     }
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
+    if (msg != nullptr) {
+      strcpy(msg, std::string("Request failed: " + url).c_str());
+    }
     return false;
   }
 
@@ -157,6 +166,9 @@ bool download (const std::string& url, const std::string& path, downloadCallback
   } else {
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
+    if (msg != nullptr) {
+      strcpy(msg, std::string("[" + std::to_string(info.code) + "] " + url).c_str());
+    }
     return false;
   }
   curl_slist_free_all(headers);

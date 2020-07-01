@@ -321,21 +321,38 @@ bool program::get(const std::string& version) const {
   bool r;
   auto download_callback = [](nodev::progressInfo* info, void* data) {
     cli_progress* prog = (cli_progress*) data;
-    prog->set_range(0, info->total);
-    prog->set_base(info->size);
-    prog->set_pos(info->sum);
-    prog->print();
+    if (info->total != -1) {
+      prog->set_range(0, info->total);
+      prog->set_base(info->size);
+      prog->set_pos(info->sum);
+      prog->print();
+    } else {
+      if (info->end) {
+        prog->set_range(0, 100);
+        prog->set_base(0);
+        prog->set_pos(100);
+      } else {
+        prog->set_range(0, 100);
+        prog->set_base(0);
+        prog->set_pos(0);
+      }
+      prog->set_additional(std::to_string(info->sum) + " Byte");
+      prog->print();
+    }
   };
   bool e = toyo::fs::exists(node_path);
 #ifdef _WIN32
   if (!e) {
     cli_progress* progress = new cli_progress(std::string("Downloading ") + node_name, 0, 100, 0, 0);
+    std::string url = config_->node_mirror + "/v" + version + "/win-" + config_->node_arch + "/node.exe";
+    char msg[256];
     try {
       r = nodev::download(
-        config_->node_mirror + "/v" + version + "/win-" + config_->node_arch + "/node.exe",
+        url,
         node_path,
         download_callback,
-        (void*)progress
+        (void*)progress,
+        msg
       );
     } catch (const std::exception& err) {
       toyo::console::error(err.what());
@@ -345,6 +362,7 @@ bool program::get(const std::string& version) const {
     delete progress;
 
     if (!r) {
+      toyo::console::error(msg);
       return false;
     }
   }
@@ -352,12 +370,15 @@ bool program::get(const std::string& version) const {
   std::string shasum = toyo::path::join(node_cache_dir, "SHASUMS256-" + version + ".txt");
   if (!toyo::fs::exists(shasum)) {
     cli_progress* progress = new cli_progress(std::string("Downloading SHASUMS256.txt"), 0, 100, 0, 0);
+    std::string url = config_->node_mirror + "/v" + version + "/SHASUMS256.txt";
+    char msg[256];
     try {
       r = nodev::download(
-        config_->node_mirror + "/v" + version + "/SHASUMS256.txt",
+        url,
         shasum,
         download_callback,
-        (void*)progress
+        (void*)progress,
+        msg
       );
     } catch (const std::exception& err) {
       toyo::console::error(err.what());
@@ -366,6 +387,7 @@ bool program::get(const std::string& version) const {
     }
 
     if (!r) {
+      toyo::console::error(msg);
       return false;
     }
 
@@ -410,12 +432,15 @@ bool program::get(const std::string& version) const {
 
   if (!e) {
     cli_progress* progress = new cli_progress(std::string("Downloading ") + tgzname, 0, 100, 0, 0);
+    std::string url = config_->node_mirror + "/v" + version + "/node-v" + version + "-" + NODEV_PLATFORM + "-" + config_->node_arch + ".tar.gz";
+    char msg[256];
     try {
       r = nodev::download(
-        config_->node_mirror + "/v" + version + "/node-v" + version + "-" + NODEV_PLATFORM + "-" + config_->node_arch + ".tar.gz",
+        url,
         tgzpath,
         download_callback,
-        (void*)progress
+        (void*)progress,
+        msg
       );
     } catch (const std::exception& err) {
       toyo::console::error(err.what());
@@ -426,6 +451,7 @@ bool program::get(const std::string& version) const {
     delete progress;
 
     if (!r) {
+      toyo::console::error(msg);
       return false;
     }
 
@@ -457,12 +483,14 @@ bool program::get_npm(const std::string& version) const {
 
   if (!toyo::fs::exists(npm_zip_path)) {
     cli_progress* progress = new cli_progress(std::string("Downloading ") + npm_zip_name, 0, 100, 0, 0);
+    char msg[256];
     try {
       r = nodev::download(
         config_->npm_mirror + "/v" + version + ".zip",
         npm_zip_path,
         download_callback,
-        (void*)progress
+        (void*)progress,
+        msg
       );
     } catch (const std::exception& err) {
       toyo::console::error(err.what());
@@ -473,6 +501,7 @@ bool program::get_npm(const std::string& version) const {
     delete progress;
 
     if (!r) {
+      toyo::console::error(msg);
       return false;
     }
 
@@ -489,7 +518,6 @@ bool program::use(const std::string& version) const {
   if (!toyo::fs::exists(node_path)) {
     if (!this->get(version)) {
       toyo::console::error("Use failed.");
-      toyo::console::error("Directory does not exists: " + node_path);
       return false;
     }
   }

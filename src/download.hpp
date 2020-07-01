@@ -18,6 +18,7 @@ typedef struct progressInfo {
   long sum;
   long total;
   int speed;
+  bool end;
   std::chrono::steady_clock::time_point start_time;
   std::chrono::steady_clock::time_point last_time;
   std::chrono::steady_clock::time_point end_time;
@@ -27,7 +28,7 @@ typedef struct progressInfo {
   long code;
 } progressInfo;
 
-bool download (const std::string& url, const std::string& path, downloadCallback callback, void* param);
+bool download (const std::string& url, const std::string& path, downloadCallback callback, void* param, char* msg = nullptr);
 
 }
 
