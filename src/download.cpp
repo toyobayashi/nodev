@@ -58,6 +58,7 @@ static size_t onDataWrite(void* buffer, size_t size, size_t nmemb, progressInfo 
   if ((now - userp->last_time) > std::chrono::milliseconds(200)) {
     userp->last_time = now;
     userp->speed = 0;
+    fflush(userp->fp);
     if (userp->callback) {
       userp->callback(userp, userp->param);
     }
@@ -70,6 +71,7 @@ static int onClose(progressInfo* userp, curl_socket_t item) {
   auto now = std::chrono::steady_clock::now();
   userp->end_time = now;
   userp->end = true;
+  if (userp->fp != nullptr) fflush(userp->fp);
   if (userp->code < 400 && userp->callback) {
     userp->callback(userp, userp->param);
   }

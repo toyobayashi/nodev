@@ -325,7 +325,7 @@ bool program::get(const std::string& version) const {
       prog->set_range(0, info->total);
       prog->set_base(info->size);
       prog->set_pos(info->sum);
-      prog->print();
+      prog->set_additional("");
     } else {
       if (info->end) {
         prog->set_range(0, 100);
@@ -336,9 +336,9 @@ bool program::get(const std::string& version) const {
         prog->set_base(0);
         prog->set_pos(0);
       }
-      prog->set_additional(std::to_string(info->sum) + " Byte");
-      prog->print();
+      prog->set_additional(std::to_string(info->size + info->sum) + " Byte");
     }
+    prog->print();
   };
   bool e = toyo::fs::exists(node_path);
 #ifdef _WIN32
