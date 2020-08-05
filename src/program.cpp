@@ -294,10 +294,11 @@ void program::list() const {
   }
   auto current_exe = toyo::path::join(this->root_(), NODEV_NODE_EXE);
   std::string wver = "";
+  std::string current_arch = "";
   if (toyo::fs::exists(current_exe)) {
     wver = get_node_version(current_exe);
+    current_arch = is_x64_executable(current_exe) ? "x64" : "x86";
   }
-  std::string current_arch = is_x64_executable(current_exe) ? "x64" : "x86";
   for (std::size_t i = 0; i < size; i++) {
     auto targetFile = toyo::path::join(cache_dir, li[i]);
     auto ext = toyo::path::extname(targetFile);
