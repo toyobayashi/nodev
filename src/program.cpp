@@ -107,7 +107,7 @@ std::string program::get_node_version(const std::string& exe_path) {
     node = exe_path;
   }
 
-  std::string cmd = node + " -v>" + tmpfileq;
+  std::string cmd = node + " -v>" + toyo::charset::a2acp(tmpfileq);
   int r = ::system(cmd.c_str());
   if (r != 0) {
     // failed
