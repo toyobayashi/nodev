@@ -403,7 +403,7 @@ bool program::get(const std::string& version) const {
     return false;
   }
 
-  std::ifstream shatxtFile(shasum, std::ios::in);
+  std::ifstream shatxtFile(toyo::charset::a2acp(shasum), std::ios::in);
   std::string line = "";
 
   bool checked = false;
