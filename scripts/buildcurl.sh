@@ -7,7 +7,7 @@ cd ./deps/curl
 chmod +x ./buildconf ./configure
 ./buildconf
 # sudo apt install libssl-dev -y
-./configure --prefix=`pwd`/builds/"$os" --with-darwinssl --disable-shared --enable-static --disable-thread --without-libidn2 --without-brotli --without-librtmp --disable-ldap --disable-ldaps
+./configure --prefix=`pwd`/builds/"$os" --with-darwinssl --disable-shared --enable-static --disable-thread --without-libidn2 --without-brotli --without-librtmp --without-nghttp2 --disable-ldap --disable-ldaps
 make
 make install
 cd ../..
