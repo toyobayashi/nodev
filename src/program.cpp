@@ -562,7 +562,7 @@ bool program::use_npm(const std::string& version) const {
 
   cli_progress* progress = new cli_progress(std::string("Extracting npm ") + version, 0, 100, 0, 0);
   try {
-    nodev::unzip(npm_zip_path, npm_unzip_dir, [](nodev::unzCallbackInfo* info, void* data) {
+    nodev::unzip(toyo::charset::a2acp(npm_zip_path), npm_unzip_dir, [](nodev::unzCallbackInfo* info, void* data) {
       cli_progress* prog = (cli_progress*) data;
       prog->set_range(0, info->total);
       prog->set_pos(info->uncompressed);
